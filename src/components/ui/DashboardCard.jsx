@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export default function DashboardCard({
+  url,
   title,
   value,
   icon,
@@ -33,7 +34,7 @@ export default function DashboardCard({
   const s = styles[variant] || styles.primary;
 
   return (
-    <Link href={`${title.toLowerCase()}`}>
+    <Link href={`${url.toLowerCase()}`}>
       <div
         className={`bg-surface rounded-2xl border border-black/10 shadow-md p-5 
         transition hover:-translate-y-0.5 hover:shadow-md hover:ring-2 ${s.ring}`}

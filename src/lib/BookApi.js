@@ -1,27 +1,35 @@
 import { API_BASE_URL } from "./BaseUrl";
 import { getAuthHeaders, buildQuery } from "./ApiUtils";
 
-const BASE_URL = `${API_BASE_URL}/categories`;
+const BASE_URL = `${API_BASE_URL}/books`;
 
-// Get categories
-export async function fetchCategories({
-  page = 1,
-  pageSize = 10,
-  name = "",
-  status = "",
-  createdDate = "",
-  updatedDate = "",
-}) {
-  const query = buildQuery({
-    page,
-    pageSize,
-    name,
-    status,
-    createdDate,
-    updatedDate,
+export async function fetchBooks(params = {}) {
+  const query = buildQuery(params);
+  const url = query ? `${BASE_URL}?${query}` : BASE_URL;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: getAuthHeaders(),
   });
 
-  const res = await fetch(`${BASE_URL}?${query}`, {
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+
+  const data = await res.json();
+
+  return {
+    items: data.content || [],
+    totalItems: data.totalElements || 0,
+    totalPages: data.totalPages || 0,
+    currentPage: data.number || 0,
+    pageSize: data.size || 10,
+  };
+}
+
+export async function fetchBookById(id) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: "GET",
     headers: getAuthHeaders(),
   });
 
@@ -32,8 +40,7 @@ export async function fetchCategories({
   return res.json();
 }
 
-// Add category
-export async function createCategory(data) {
+export async function createBook(data) {
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -47,21 +54,7 @@ export async function createCategory(data) {
   return res.json();
 }
 
-// Get category by id
-export async function getCategory(id) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    headers: getAuthHeaders(),
-  });
-
-  if (!res.ok) {
-    throw new Error(await res.text());
-  }
-
-  return res.json();
-}
-
-// Update category
-export async function updateCategory(id, data) {
+export async function updateBook(id, data) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
@@ -75,8 +68,7 @@ export async function updateCategory(id, data) {
   return res.json();
 }
 
-// Delete category
-export async function deleteCategory(id) {
+export async function deleteBook(id) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),

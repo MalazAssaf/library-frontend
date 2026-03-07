@@ -1,26 +1,7 @@
-const BASE_URL = "http://localhost:8080/api/authors";
+import { API_BASE_URL } from "./BaseUrl";
+import { getAuthHeaders, buildQuery } from "./ApiUtils";
 
-function getAuthHeaders() {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
-
-function buildQuery(params = {}) {
-  const query = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      query.append(key, value);
-    }
-  });
-
-  return query.toString();
-}
-
+const BASE_URL = `${API_BASE_URL}/authors`;
 export async function fetchAuthors(params = {}) {
   const query = buildQuery(params);
   const url = query ? `${BASE_URL}?${query}` : BASE_URL;
