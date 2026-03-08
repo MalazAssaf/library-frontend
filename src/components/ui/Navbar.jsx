@@ -61,24 +61,24 @@ export default function Navbar() {
         <nav className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:gap-x-4 sm:gap-y-2 py-1 mt-5">
           <NavItem href="/">DASHBOARD</NavItem>
           <Dropdown
+            label="BOOKS"
+            items={[
+              { label: "Add Book", href: "/books/new" },
+              { label: "Manage Books", href: "/books" },
+            ]}
+          />
+          <Dropdown
             label="CATEGORIES"
             items={[
-              { label: "All Categories", href: "/categories" },
               { label: "Add Category", href: "/categories/new" },
+              { label: "Manage Categories", href: "/categories" },
             ]}
           />
           <Dropdown
             label="AUTHORS"
             items={[
-              { label: "All Authors", href: "/authors" },
               { label: "Add Author", href: "/authors/new" },
-            ]}
-          />
-          <Dropdown
-            label="BOOKS"
-            items={[
-              { label: "All Books", href: "/books" },
-              { label: "Add Book", href: "/books/new" },
+              { label: "Manage Authors", href: "/authors" },
             ]}
           />
         </nav>

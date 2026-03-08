@@ -1,35 +1,98 @@
 "use client";
-import { BookItemInfoTab } from "../../../../components/tabs/BookItemInfoTab";
+
 import { useState } from "react";
 import { Box, Tabs, Tab, Paper, Button, Typography } from "@mui/material";
+import { BookItemInfoTab } from "../../../../components/tabs/BookItemInfoTab";
+import { BookDetailTab } from "../../../../components/tabs/BookDetailTab";
+import { BookAuthorsTab } from "../../../../components/tabs/BookAuthorTab";
+import { BookChaptersTab } from "../../../../components/tabs/BookChapterTab";
+import { createBook } from "../../../../lib/BookApi";
+import { createChapter } from "../../../../lib/ChapterApi";
+import { useRouter } from "next/navigation";
+import MySnackbar from "../../../../components/ui/MySnackBar";
 
 export default function AddBookPage() {
   const [tab, setTab] = useState(0);
+  const [savedBookId, setSavedBookId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const [bookData, setBookData] = useState({
-    title: "",
+    name: "",
     mediaType: "",
+    isbnType: "",
     isbn: "",
     isbn13: "",
-    status: "",
+    year: 0,
+    price: 0,
+    bookStatus: "",
     type: "",
-    otherType: "",
+    typeOther: "",
+    accessionNo: 0,
+    callNo: "",
+    edition: "",
+    seriesName: "",
     volume: "",
-    pageDuration: "",
+    pagesNumber: 0,
     subject: "",
-    abstract: "",
+    abstractText: "",
     description: "",
     url: "",
     urlVisibility: "",
     active: true,
     published: true,
-    categories: [],
-    authors: [],
-    chapters: [],
+    publisherId: 0,
+    categoryIds: [],
+    authorIds: [],
   });
 
-  function handleSubmit() {
-    console.log("Submitting all book data:", bookData);
+  const [chapters, setChapters] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  function showSnackbar(message, severity = "success") {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  }
+
+  function handleCloseSnackbar() {
+    setSnackbar((prev) => ({
+      ...prev,
+      open: false,
+    }));
+  }
+
+  async function handleSubmit() {
+    try {
+      setLoading(true);
+      console.log("Book Info", bookData);
+      const createdBook = await createBook(bookData);
+      const bookId = createdBook.id;
+      setSavedBookId(bookId);
+
+      for (const chapter of chapters) {
+        const payload = {
+          name: chapter.name,
+          order: Number(chapter.order),
+          code: chapter.code,
+        };
+        await createChapter(bookId, payload);
+      }
+
+      showSnackbar(`Book saved successfully`, "success");
+      router.push("/books");
+    } catch (error) {
+      console.log("Error", error);
+      showSnackbar(`An error occurred, please try again`, "error");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -38,6 +101,7 @@ export default function AddBookPage() {
         <Typography variant="h5" fontWeight="bold" mb={3}>
           Add New Book
         </Typography>
+
         <Box
           sx={{
             backgroundColor: "var(--color-accent)",
@@ -69,7 +133,7 @@ export default function AddBookPage() {
               }}
             />
             <Tab
-              label="DETAIL"
+              label="DETAILS"
               sx={{
                 minHeight: 40,
                 fontSize: "12px",
@@ -106,23 +170,38 @@ export default function AddBookPage() {
 
         <Box sx={{ py: 4 }}>
           {tab === 0 && (
-            <BookItemInfoTab
-              bookData={bookData}
-              setBookData={setBookData}
-              categories={bookData.categories}
+            <BookItemInfoTab bookData={bookData} setBookData={setBookData} />
+          )}
+
+          {tab === 1 && (
+            <BookDetailTab bookData={bookData} setBookData={setBookData} />
+          )}
+
+          {tab === 2 && (
+            <BookAuthorsTab bookData={bookData} setBookData={setBookData} />
+          )}
+
+          {tab === 3 && (
+            <BookChaptersTab
+              chapters={chapters}
+              setChapters={setChapters}
+              savedBookId={savedBookId}
             />
-          )}{" "}
-          {tab === 1 && <Box>Detail Component Here</Box>}
-          {tab === 2 && <Box>Authors Component Here</Box>}
-          {tab === 3 && <Box>Chapter Component Here</Box>}
+          )}
         </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="contained" onClick={handleSubmit}>
-            Save Book
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+          <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+            {loading ? "Saving..." : "Save Book"}
           </Button>
         </Box>
       </Paper>
+      <MySnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={handleCloseSnackbar}
+      />
     </Box>
   );
 }

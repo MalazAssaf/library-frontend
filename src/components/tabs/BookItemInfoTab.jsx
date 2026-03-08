@@ -122,7 +122,9 @@ export function BookItemInfoTab({ bookData, setBookData }) {
 
     setBookData((prev) => ({
       ...prev,
-      categories: typeof value === "string" ? value.split(",") : value,
+      categoryIds: (typeof value === "string" ? value.split(",") : value).map(
+        Number,
+      ),
     }));
   };
 
@@ -258,8 +260,8 @@ export function BookItemInfoTab({ bookData, setBookData }) {
           <FormControl fullWidth sx={fieldSx}>
             <InputLabel>Status</InputLabel>
             <Select
-              name="status"
-              value={bookData.status || ""}
+              name="bookStatus"
+              value={bookData.bookStatus || ""}
               onChange={handleChange}
               input={<OutlinedInput label="Status" />}
             >
@@ -311,8 +313,8 @@ export function BookItemInfoTab({ bookData, setBookData }) {
             <InputLabel>Categories</InputLabel>
             <Select
               multiple
-              name="categories"
-              value={bookData.categories || []}
+              name="categoryIds"
+              value={bookData.categoryIds || []}
               onChange={handleCategoriesChange}
               input={<OutlinedInput label="Categories" />}
               renderValue={(selected) =>
@@ -325,7 +327,7 @@ export function BookItemInfoTab({ bookData, setBookData }) {
               {activeCategories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>
                   <Checkbox
-                    checked={(bookData.categories || []).includes(category.id)}
+                    checked={(bookData.categoryIds || []).includes(category.id)}
                   />
                   <ListItemText primary={category.name} />
                 </MenuItem>

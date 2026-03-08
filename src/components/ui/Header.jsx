@@ -1,5 +1,6 @@
 "use client";
 import { LogOut, BookOpen, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -19,10 +20,13 @@ function Header() {
       grid place-items-center gap-3
       sm:flex sm:items-center sm:justify-between"
       >
-        <div className="flex items-center gap-2 text-secondary font-bold text-lg">
-          <BookOpen size={32} />
-          Library Management
-        </div>
+        {/* LOGO */}
+        <Link href={"/"}>
+          <div className="flex items-center gap-2 text-secondary font-bold text-lg">
+            <BookOpen size={32} />
+            Library Management
+          </div>
+        </Link>
 
         <div className="relative flex items-center gap-2">
           <button
@@ -30,7 +34,7 @@ function Header() {
             className="flex items-center gap-2 px-4 py-2 hover:text-primary cursor-pointer"
           >
             <User />
-            Malaz
+            {/* Malaz */}
           </button>
 
           {open && (

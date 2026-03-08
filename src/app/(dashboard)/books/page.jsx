@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import DataTable from "../../../components/ui/DataTable";
 import FilterBar from "../../../components/helpres/FilterBar";
-import EditModal from "../../../components/ui/EditModal";
 import DeleteModal from "../../../components/ui/DeleteModal";
 import AppSnackbar from "../../../components/ui/MySnackBar";
 
-import { fetchBooks, updateBook, deleteBook } from "../../../lib/BookApi";
+import { fetchBooks, deleteBook } from "../../../lib/BookApi";
 
 const years = Array.from({ length: 100 }, (_, i) => {
   const year = new Date().getFullYear() - i;
@@ -31,7 +30,7 @@ const columns = [
         restored: "bg-yellow-100 text-yellow-700",
       };
 
-      const style = styles[status] || "bg-red-100 text-red-700";
+      const style = styles[status] || "bg-red-200  text-red-700";
 
       return (
         <div
@@ -41,6 +40,46 @@ const columns = [
         </div>
       );
     },
+  },
+
+  {
+    id: "authors",
+    label: "Author",
+    render: (value) =>
+      Array.isArray(value) ? (
+        <div className="flex flex-wrap gap-1">
+          {value.map((author, i) => (
+            <span
+              key={i}
+              className="px-2 py-2 text-xs font-semibold rounded bg-indigo-100 text-indigo-700"
+            >
+              {author}
+            </span>
+          ))}
+        </div>
+      ) : (
+        ""
+      ),
+  },
+
+  {
+    id: "categories",
+    label: "Category",
+    render: (value) =>
+      Array.isArray(value) ? (
+        <div className="flex flex-wrap gap-1">
+          {value.map((cat, i) => (
+            <span
+              key={i}
+              className="px-2 py-2 text-xs font-semibold rounded bg-primary text-canavas"
+            >
+              {cat}
+            </span>
+          ))}
+        </div>
+      ) : (
+        ""
+      ),
   },
 
   { id: "isbn", label: "ISBN" },
@@ -101,40 +140,6 @@ const filterFields = [
   },
 ];
 
-const editFields = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-  },
-  {
-    name: "isbn",
-    label: "ISBN",
-    type: "text",
-  },
-  {
-    name: "year",
-    label: "Year",
-    type: "number",
-  },
-  {
-    name: "price",
-    label: "Price",
-    type: "number",
-  },
-  {
-    name: "bookStatus",
-    label: "Book Status",
-    type: "select",
-    options: [
-      { value: "NEW", label: "🟢 New" },
-      { value: "OLD", label: "⚪ Old" },
-      { value: "STERILIZED", label: "🔵 Sterilized" },
-      { value: "RESTORED", label: "🟡 Restored" },
-    ],
-  },
-];
-
 export default function BooksPage() {
   const [rows, setRows] = useState([]);
 
@@ -144,17 +149,6 @@ export default function BooksPage() {
 
   const [filters, setFilters] = useState(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
-
-  const [editingItem, setEditingItem] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    name: "",
-    isbn: "",
-    year: "",
-    price: "",
-    bookStatus: "NEW",
-  });
-
-  const [editLoading, setEditLoading] = useState(false);
 
   const [deletingItem, setDeletingItem] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -202,88 +196,8 @@ export default function BooksPage() {
     loadBooks();
   }, [page, pageSize, appliedFilters]);
 
-  const handlePageChange = (_, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSearch = () => {
-    setAppliedFilters(filters);
-    setPage(0);
-  };
-
-  const handleReset = () => {
-    setFilters(initialFilters);
-    setAppliedFilters(initialFilters);
-    setPage(0);
-  };
-
-  const handleEditOpen = (row) => {
-    setEditingItem(row);
-
-    setEditFormData({
-      name: row.name || "",
-      isbn: row.isbn || "",
-      year: row.year || "",
-      price: row.price || "",
-      bookStatus: row.bookStatus || "NEW",
-    });
-  };
-
-  const handleEditClose = () => {
-    if (editLoading) return;
-    setEditingItem(null);
-  };
-
-  const handleEditFormChange = (event) => {
-    const { name, value } = event.target;
-
-    setEditFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleEditSave = async () => {
-    if (!editingItem) return;
-
-    try {
-      setEditLoading(true);
-
-      await updateBook(editingItem.id, editFormData);
-
-      showSnackbar("Book updated successfully");
-      setEditingItem(null);
-      loadBooks();
-    } catch (err) {
-      console.error(err);
-      showSnackbar("Failed to update book", "error");
-    } finally {
-      setEditLoading(false);
-    }
-  };
-
-  const handleDeleteOpen = (row) => {
-    setDeletingItem(row);
-  };
-
-  const handleDeleteClose = () => {
-    if (deleteLoading) return;
-    setDeletingItem(null);
-  };
+  const handleDeleteOpen = (row) => setDeletingItem(row);
+  const handleDeleteClose = () => setDeletingItem(null);
 
   const handleDeleteConfirm = async () => {
     if (!deletingItem) return;
@@ -295,12 +209,7 @@ export default function BooksPage() {
 
       showSnackbar("Book deleted successfully");
       setDeletingItem(null);
-
-      if (rows.length === 1 && page > 0) {
-        setPage((prev) => prev - 1);
-      } else {
-        loadBooks();
-      }
+      loadBooks();
     } catch (err) {
       console.error(err);
       showSnackbar("Failed to delete book", "error");
@@ -314,37 +223,36 @@ export default function BooksPage() {
       <FilterBar
         filters={filters}
         fields={filterFields}
-        onChange={handleFilterChange}
-        onSearch={handleSearch}
-        onReset={handleReset}
+        onChange={(e) =>
+          setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+        }
+        onSearch={() => {
+          setAppliedFilters(filters);
+          setPage(0);
+        }}
+        onReset={() => {
+          setFilters(initialFilters);
+          setAppliedFilters(initialFilters);
+          setPage(0);
+        }}
       />
 
       <DataTable
         columns={columns}
         rows={rows}
         getRowKey={(r) => r.id}
-        onEdit={handleEditOpen}
         onDelete={handleDeleteOpen}
         title="Books Listing"
         page={page}
         rowsPerPage={pageSize}
         totalCount={totalItems}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        onRowsPerPageChange={(e) => {
+          setPageSize(parseInt(e.target.value, 10));
+          setPage(0);
+        }}
         searchable={false}
       />
-
-      <EditModal
-        open={Boolean(editingItem)}
-        title="Edit Book"
-        fields={editFields}
-        formData={editFormData}
-        loading={editLoading}
-        onClose={handleEditClose}
-        onChange={handleEditFormChange}
-        onSubmit={handleEditSave}
-      />
-
       <DeleteModal
         open={Boolean(deletingItem)}
         title="Delete Book"

@@ -40,13 +40,11 @@ const columns = [
             isLive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
           }`}
         >
-          {value}
+          {value.charAt(0).toUpperCase() + value.slice(1)}
         </div>
       );
     },
   },
-  // { id: "email", label: "Email" },
-  // { id: "mobile", label: "Mobile" },
 ];
 
 const initialFilters = {
@@ -80,12 +78,6 @@ const filterFields = [
 ];
 
 const editFields = [
-  // {
-  //   name: "nickname",
-  //   label: "Nickname",
-  //   type: "text",
-  //   placeholder: "Enter nickname",
-  // },
   {
     name: "name",
     label: "Name",
@@ -117,18 +109,6 @@ const editFields = [
     label: "Date Died",
     type: "date",
   },
-  // {
-  //   name: "email",
-  //   label: "Email",
-  //   type: "email",
-  //   placeholder: "Enter email",
-  // },
-  // {
-  //   name: "mobile",
-  //   label: "Mobile",
-  //   type: "text",
-  //   placeholder: "Enter mobile",
-  // },
   {
     name: "bio",
     label: "Bio",
