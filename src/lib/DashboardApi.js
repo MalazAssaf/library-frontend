@@ -13,7 +13,7 @@ async function fetchCount(url) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();

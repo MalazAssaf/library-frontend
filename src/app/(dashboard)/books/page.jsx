@@ -15,7 +15,13 @@ const years = Array.from({ length: 100 }, (_, i) => {
 
 const columns = [
   { id: "id", label: "ID" },
-  { id: "name", label: "Name" },
+  {
+    id: "name",
+    label: "Name",
+    render: (value) => (
+      <p>{value.charAt(0).toUpperCase() + value.toLowerCase().slice(1)}</p>
+    ),
+  },
 
   {
     id: "bookStatus",
@@ -30,13 +36,13 @@ const columns = [
         restored: "bg-yellow-100 text-yellow-700",
       };
 
-      const style = styles[status] || "bg-red-200  text-red-700";
+      const style = styles[status] || "bg-red-200 text-red-700";
 
       return (
         <div
           className={`py-2 rounded text-center w-24 text-sm font-semibold ${style}`}
         >
-          {value}
+          {value.charAt(0).toUpperCase() + value.toLowerCase().slice(1)}
         </div>
       );
     },
@@ -82,7 +88,12 @@ const columns = [
       ),
   },
 
-  { id: "isbn", label: "ISBN" },
+  {
+    id: "isbn",
+    label: "ISBN",
+    render: (_, row) => row.isbn || row.isbn13 || "-",
+  },
+
   { id: "year", label: "Year" },
   { id: "price", label: "Price" },
 ];
@@ -186,6 +197,7 @@ export default function BooksPage() {
 
       setRows(data.items || []);
       setTotalItems(data.totalItems || 0);
+      console.log("Total Items are => ", data.items);
     } catch (err) {
       console.error(err);
       showSnackbar("Failed to load books", "error");

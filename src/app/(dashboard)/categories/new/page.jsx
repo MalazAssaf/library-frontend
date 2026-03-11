@@ -73,6 +73,7 @@ function NewCategory() {
       }, 1200);
     } catch (err) {
       const message = err.message || "Category name already exists";
+      console.log("Erorrororo", err);
       showSnackbar(message, "error");
     } finally {
       setLoading(false);

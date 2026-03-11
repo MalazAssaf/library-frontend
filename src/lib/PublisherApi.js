@@ -26,7 +26,7 @@ export async function fetchPublishers({
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -41,7 +41,7 @@ export async function createPublisher(data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();

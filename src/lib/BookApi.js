@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "./BaseUrl";
 import { getAuthHeaders, buildQuery } from "./ApiUtils";
+import { getErrorMessage } from "./ApiUtils";
 
 export const BOOK_BASE_URL = `${API_BASE_URL}/books`;
 
@@ -17,7 +18,7 @@ export async function fetchBooks(params = {}) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   const data = await res.json();
@@ -42,7 +43,7 @@ export async function fetchBookById(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -63,7 +64,7 @@ export async function createBook(data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -80,7 +81,7 @@ export async function deleteBook(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return true;

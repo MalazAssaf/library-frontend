@@ -28,7 +28,7 @@ export default function AddBookPage() {
     bookStatus: "",
     type: "",
     typeOther: "",
-    accessionNo: 0,
+    accessionNo: "",
     callNo: "",
     edition: "",
     seriesName: "",
@@ -68,12 +68,72 @@ export default function AddBookPage() {
     }));
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!bookData.name.trim()) {
+      showSnackbar("Name of the book is required", "error");
+      return;
+    }
+
+    if (!bookData.mediaType) {
+      showSnackbar("Media type is required", "error");
+      return;
+    }
+
+    if (!bookData.isbnType) {
+      showSnackbar("ISBN type is required", "error");
+      return;
+    }
+
+    if (bookData.isbnType === "ISBN" && !/^\d{10}$/.test(bookData.isbn)) {
+      showSnackbar("ISBN must contain exactly 10 digits", "error");
+      return;
+    }
+
+    if (bookData.isbnType === "ISBN13" && !/^\d{13}$/.test(bookData.isbn13)) {
+      showSnackbar("ISBN13 must contain exactly 13 digits", "error");
+      return;
+    }
+
+    if (!bookData.year || bookData.year <= 0) {
+      showSnackbar("Year is required", "error");
+      return;
+    }
+
+    if (!bookData.price || bookData.price <= 0) {
+      showSnackbar("Price is required", "error");
+      return;
+    }
+
+    if (!bookData.bookStatus) {
+      showSnackbar("Book status is required", "error");
+      return;
+    }
+
+    if (!bookData.publisherId) {
+      showSnackbar("Publisher is required", "error");
+      return;
+    }
+
+    if (!bookData.categoryIds || bookData.categoryIds.length === 0) {
+      showSnackbar("At least one category is required", "error");
+      return;
+    }
+
+    if (!bookData.authorIds || bookData.authorIds.length === 0) {
+      showSnackbar("At least one author is required", "error");
+      return;
+    }
+
     try {
       setLoading(true);
+
       console.log("Book Info", bookData);
+
       const createdBook = await createBook(bookData);
       const bookId = createdBook.id;
+
       setSavedBookId(bookId);
 
       for (const chapter of chapters) {
@@ -82,14 +142,16 @@ export default function AddBookPage() {
           order: Number(chapter.order),
           code: chapter.code,
         };
+
         await createChapter(bookId, payload);
       }
 
-      showSnackbar(`Book saved successfully`, "success");
+      showSnackbar("Book saved successfully", "success");
+
       router.push("/books");
     } catch (error) {
       console.log("Error", error);
-      showSnackbar(`An error occurred, please try again`, "error");
+      showSnackbar(error.message, "error");
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 "use client";
+
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,9 +8,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import TextField from "@mui/material/TextField";
-import { Pencil, Trash2, SearchIcon } from "lucide-react";
-import InputAdornment from "@mui/material/InputAdornment";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function DataTable({
   columns = [],
@@ -20,14 +19,11 @@ export default function DataTable({
   title,
   firstColWidth = 70,
   actionsColWidth = 180,
-  searchable = true,
   page = 0,
   rowsPerPage = 10,
   totalCount = 0,
   onPageChange,
   onRowsPerPageChange,
-  searchValue = "",
-  onSearchChange,
 }) {
   const hasActions = Boolean(onEdit || onDelete);
 
@@ -43,6 +39,18 @@ export default function DataTable({
     whiteSpace: "nowrap",
   };
 
+  function getCellValue(col, row) {
+    if (typeof col.value === "function") {
+      return col.value(row);
+    }
+
+    if (typeof col.accessor === "function") {
+      return col.accessor(row);
+    }
+
+    return row?.[col.id];
+  }
+
   return (
     <Paper
       sx={{
@@ -56,44 +64,6 @@ export default function DataTable({
         <div className="font-bold">
           <p>{title}</p>
         </div>
-
-        {searchable && (
-          <div>
-            <TextField
-              value={searchValue}
-              onChange={(e) => onSearchChange?.(e.target.value)}
-              placeholder="Search"
-              size="small"
-              fullWidth
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "var(--color-surface)",
-                  borderRadius: "12px",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(0,0,0,0.15)",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--color-primary)",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--color-primary)",
-                    borderWidth: "2px",
-                  },
-                },
-                "& .MuiInputBase-input": {
-                  color: "var(--color-text-base)",
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-        )}
       </div>
 
       <TableContainer sx={{ maxHeight: 440, overflowX: "auto" }}>
@@ -136,20 +106,24 @@ export default function DataTable({
                   getRowKey ? getRowKey(row, rowIndex) : (row.id ?? rowIndex)
                 }
               >
-                {columns.map((col, i) => (
-                  <TableCell
-                    key={(col.id ?? i) + "-" + rowIndex}
-                    sx={{
-                      ...bodyCellSx,
-                      width: i === 0 ? firstColWidth : "auto",
-                      maxWidth: i === 0 ? firstColWidth : "none",
-                    }}
-                  >
-                    {col.render
-                      ? col.render(row?.[col.id], row)
-                      : (row?.[col.id] ?? "-")}
-                  </TableCell>
-                ))}
+                {columns.map((col, i) => {
+                  const cellValue = getCellValue(col, row);
+
+                  return (
+                    <TableCell
+                      key={(col.id ?? i) + "-" + rowIndex}
+                      sx={{
+                        ...bodyCellSx,
+                        width: i === 0 ? firstColWidth : "auto",
+                        maxWidth: i === 0 ? firstColWidth : "none",
+                      }}
+                    >
+                      {col.render
+                        ? col.render(cellValue, row)
+                        : (cellValue ?? "-")}
+                    </TableCell>
+                  );
+                })}
 
                 {hasActions && (
                   <TableCell
@@ -237,7 +211,6 @@ export default function DataTable({
         sx={{
           color: "var(--color-foreground)",
           backgroundColor: "var(--color-canavas)",
-
           "& .MuiTablePagination-selectLabel": {
             color: "var(--color-foreground)",
           },
@@ -253,7 +226,6 @@ export default function DataTable({
           "& .MuiIconButton-root": {
             color: "var(--color-foreground)",
           },
-
           "& .MuiIconButton-root.Mui-disabled": {
             color: "rgba(0, 0, 0, 0.3)",
             pointerEvents: "none",

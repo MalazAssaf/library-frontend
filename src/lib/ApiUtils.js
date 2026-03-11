@@ -18,3 +18,17 @@ export function buildQuery(params = {}) {
 
   return query.toString();
 }
+
+export async function getErrorMessage(res) {
+  const contentType = res.headers.get("content-type");
+
+  if (contentType && contentType.includes("application/json")) {
+    const data = await res.json().catch(() => null);
+    return (
+      data?.message || data?.error || `Request failed with status ${res.status}`
+    );
+  }
+
+  const text = await res.text().catch(() => "");
+  return text || `Request failed with status ${res.status}`;
+}

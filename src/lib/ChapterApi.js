@@ -12,7 +12,7 @@ export async function createChapter(bookId, data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();

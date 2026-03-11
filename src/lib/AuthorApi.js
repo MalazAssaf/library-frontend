@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "./BaseUrl";
-import { getAuthHeaders, buildQuery } from "./ApiUtils";
+import { getAuthHeaders, buildQuery, getErrorMessage } from "./ApiUtils";
 
 const BASE_URL = `${API_BASE_URL}/authors`;
 export async function fetchAuthors(params = {}) {
@@ -12,7 +12,7 @@ export async function fetchAuthors(params = {}) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   const data = await res.json();
@@ -33,7 +33,7 @@ export async function fetchAuthorById(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -47,7 +47,7 @@ export async function createAuthor(data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -61,7 +61,7 @@ export async function updateAuthor(id, data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -74,7 +74,7 @@ export async function deleteAuthor(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return true;

@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "./BaseUrl";
 import { getAuthHeaders, buildQuery } from "./ApiUtils";
+import { getErrorMessage } from "./ApiUtils";
 
 const BASE_URL = `${API_BASE_URL}/categories`;
 
@@ -26,7 +27,7 @@ export async function fetchCategories({
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -41,7 +42,7 @@ export async function createCategory(data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -54,7 +55,7 @@ export async function getCategory(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -69,7 +70,7 @@ export async function updateCategory(id, data) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return res.json();
@@ -83,7 +84,7 @@ export async function deleteCategory(id) {
   });
 
   if (!res.ok) {
-    throw new Error(await res.text());
+    throw new Error(await getErrorMessage(res));
   }
 
   return true;
