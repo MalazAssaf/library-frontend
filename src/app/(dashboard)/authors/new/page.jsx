@@ -11,6 +11,7 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 
 function NewAuthor() {
+  const today = new Date().toLocaleDateString("en-CA");
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -201,14 +202,18 @@ function NewAuthor() {
             />
 
             <TextField
-              name="dateBorn"
-              label="Date Born"
+              name="dateDied"
+              label="Date Died"
               type="date"
               variant="outlined"
               fullWidth
-              value={formData.dateBorn}
+              value={formData.dateDied}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
+              inputProps={{
+                max: today,
+                min: formData.dateBorn || undefined,
+              }}
             />
 
             <FormControl fullWidth>
@@ -239,6 +244,10 @@ function NewAuthor() {
                 value={formData.dateDied}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  max: today,
+                  min: formData.dateBorn || undefined,
+                }}
               />
             )}
           </div>

@@ -16,6 +16,7 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
+import { Pencil, Trash2 } from "lucide-react";
 
 import MySnackbar from "../ui/MySnackBar";
 
@@ -198,9 +199,18 @@ export function BookChaptersTab({ chapters, setChapters, savedBookId }) {
                 <Button
                   size="small"
                   variant="outlined"
-                  sx={{ mr: 1 }}
+                  sx={{
+                    mr: 1,
+                    backgroundColor: "var(--color-accent)",
+                    color: "var(--color-canavas)",
+                    gap: "5px",
+                    padding: "8px 5px",
+                    textTransform: "capitalize",
+                    borderRadius: "10px",
+                  }}
                   onClick={() => handleEdit(index)}
                 >
+                  <Pencil size={16} />
                   Edit
                 </Button>
 
@@ -208,8 +218,17 @@ export function BookChaptersTab({ chapters, setChapters, savedBookId }) {
                   size="small"
                   color="error"
                   variant="outlined"
+                  sx={{
+                    backgroundColor: "var(--color-error)",
+                    color: "var(--color-canavas)",
+                    gap: "5px",
+                    padding: "8px 5px",
+                    textTransform: "capitalize",
+                    borderRadius: "10px",
+                  }}
                   onClick={() => handleDelete(index)}
                 >
+                  <Trash2 size={16} />
                   Delete
                 </Button>
               </TableCell>
