@@ -202,17 +202,16 @@ function NewAuthor() {
             />
 
             <TextField
-              name="dateDied"
-              label="Date Died"
+              name="dateBorn"
+              label="Date Born"
               type="date"
               variant="outlined"
               fullWidth
-              value={formData.dateDied}
+              value={formData.dateBorn}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
               inputProps={{
                 max: today,
-                min: formData.dateBorn || undefined,
               }}
             />
 
